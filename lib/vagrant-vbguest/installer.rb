@@ -29,14 +29,22 @@ module VagrantVbguest
         @vm.ui.success(I18n.t("vagrant.plugins.vbguest.guest_ok", :version => guest_version)) unless needs_update?
         @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.check_failed", :host => vb_version, :guest => guest_version)) if @options[:no_install]
 
-        if @options[:force] || (!@options[:no_install] && needs_update?)
+        if !needs_update? && !KernelModuleDetector.new(@vm).loaded?
+          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.kernel_module_not_loaded"))
+          @vm.ui.info rebuilder_script
+          if (r_script = rebuilder_script)
+            @vm.channel.sudo(r_script) do |type, data|
+              @vm.ui.info(data, :prefix => false, :new_line => false)
+            end
+          end
+        elsif @options[:force] || (!@options[:no_install] && needs_update?)
           @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing#{@options[:force] ? '_forced' : ''}", :host => vb_version, :guest => guest_version))
 
           # :TODO:
           # the whole installation process should be put into own classes
           # like the vagrant system loading
           if (i_script = installer_script)
-            @options[:iso_path] ||= VagrantVbguest::Detector.new(@vm, @options).iso_path
+            @options[:iso_path] ||= VagrantVbguest::IsoDetector.new(@vm, @options).iso_path
 
             @vm.ui.info(I18n.t("vagrant.plugins.vbguest.start_copy_iso", :from => iso_path, :to => iso_destination))
             @vm.channel.upload(iso_path, iso_destination)
@@ -81,6 +89,16 @@ module VagrantVbguest
         File.expand_path("../../../files/setup_linux.sh", __FILE__)
       else
         @vm.ui.error(I18n.t("vagrant.plugins.vbguest.no_install_script_for_platform", :platform => platform.to_s))
+        nil
+      end
+    end
+
+    def rebuilder_script
+      platform = @vm.guest.distro_dispatch
+      case platform
+      when :debian, :ubuntu, :gentoo, :redhat, :suse, :arch, :linux
+        '/etc/init.d/vboxadd setup'
+      else
         nil
       end
     end
