@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   # s.add_development_dependency "rspec"
   # s.add_runtime_dependency "rest-client"
   
-  s.add_dependency "vagrant", ">= 0.9.4"
+  s.add_dependency "vagrant", ">= 1.1.0.dev"
   s.add_development_dependency "bundler", ">= 1.0.0"
   
   s.files         = `git ls-files`.split("\n")

@@ -4,7 +4,7 @@ module VagrantVbguest
   # Additions to match the installed VirtualBox installation on the
   # host system.
 
-  class Middleware
+  class Action
     def initialize(app, env, options = {})
       @app = app
       @env = env
@@ -14,6 +14,7 @@ module VagrantVbguest
     def call(env)
       options = @vm.config.vbguest.to_hash
       options[:auto_update] = true if options[:auto_update].nil?
+      @vm.ui.info "auto_update is #{options[:auto_update] ? 'on' : 'off'}"
       VagrantVbguest::Installer.new(@vm, options).run
       @app.call(env)
     end

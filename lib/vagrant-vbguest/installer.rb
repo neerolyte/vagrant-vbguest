@@ -101,7 +101,7 @@ module VagrantVbguest
           @env[:iso_url]
         else
           # :TODO: This will also raise, if the iso_url points to an invalid local path
-          raise VagrantVbguest::DownloadingDisabledError.new(:from => @env[:iso_url]) if @options[:no_remote]
+          raise VagrantVbguest::Errors::DownloadingDisabledError.new(:from => @env[:iso_url]) if @options[:no_remote]
           @download = VagrantVbguest::Download.new(@env)
           @download.download
           @download.temp_path

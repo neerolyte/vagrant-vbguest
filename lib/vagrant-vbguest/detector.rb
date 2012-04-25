@@ -15,7 +15,7 @@ module VagrantVbguest
 
       def autodetect_iso
         path = media_manager_iso || guess_iso || web_iso
-        raise VagrantVbguest::IsoPathAutodetectionError if !path || path.empty?
+        raise VagrantVbguest::Errors::IsoPathAutodetectionError if !path || path.empty?
         path
       end
 
