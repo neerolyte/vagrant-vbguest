@@ -3,7 +3,7 @@ module VagrantVbguest
   module Errors
 
     class VbguestError < Vagrant::Errors::VagrantError
-      def error_namespace; "vagrant.plugins.vbguest.errors"; end
+      error_namespace "vagrant.plugins.vbguest.errors"
     end
     
     class IsoPathAutodetectionError < VbguestError
