@@ -42,6 +42,7 @@ However, here is an example for your `Vagrantfile`:
 The `iso_path` may contain the optional placeholder `$VBOX_VERSION` for the detected version (e.g. `4.1.8`).
 The URI for the actual iso download reads: `http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso`<br/>
 vbguest will try to autodetect the best option for your system. WTF? see below.
+* `installer` : A reference to a (custom) installer class
 * `auto_update` (Boolean, dafault: `true`) : Whether to check the correct additions version on each start (where start is _not_ resuming a box).
 * `no_install` (Boolean, default: `false`) : Whether to check the correct additions version only. This will warn you about version mis-matches, but will not try to install anything.
 * `no_remote` (Boolean, default: `false`) : Whether to _not_ download the iso file from a remote location. This includes any `http` location!
@@ -60,6 +61,29 @@ If it cannot find one, it downloads one from the web (virtualbox.org). Those pla
 You may also run the installer manually:
 
     $ vagrant vbguest [vm-name] [-f|--force] [-I|--no-install] [-R|--no-remote] [--iso VBoxGuestAdditions.iso]
+
+## Advanced
+
+vagrant-vbguest provides installers for generic linux and debian/ubuntu.  
+Installers take care of the whole installation process, that includes where to save the iso file inside the guest and where to mount it.
+
+    
+    class MyInstaller < VagrantVbguest::Installers::Linux
+      # use /temp instead of /tmp
+      def tmp_path
+        '/temp/VBoxGuestAdditions.iso'
+      end
+
+      # use /media instead of /mnt
+      def mount_point
+        '/media'
+      end
+    end
+    
+    Vagrant::Config.run do |config|
+      config.vbguest.installer = MyInstaller
+    end
+
 
 ## Knows Issues
 
