@@ -1,5 +1,9 @@
 module VagrantVbguest
   module Installers
+    class Error < Vagrant::Errors::VagrantError
+      error_namespace "vagrant.plugins.vbguest.errors.installer"
+    end
+
     class Base
 
       def self.match?(vm)

@@ -26,6 +26,10 @@ en:
             Please configure a local path to the iso using `config.vbguest.iso_path` 
             in your Vagrantfile or the `--iso` command line option.
 
+          installer:
+            do_not_inherit_match_method: |-
+              Installer classes must proviode their own `match?` method.
+
         config:
           errors:
             invalid_installer_class: |-

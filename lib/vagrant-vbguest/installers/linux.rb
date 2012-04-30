@@ -8,6 +8,7 @@ module VagrantVbguest
       end
 
       def self.match?(vm)
+        raise Error, :_key => :do_not_inherit_match_method if self.class != Linux
         vm.channel.test("uname | grep 'Linux'")
       end
       
