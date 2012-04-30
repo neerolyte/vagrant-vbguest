@@ -1,10 +1,13 @@
 module VagrantVbguest
   
   class Config < Vagrant::Config::Base
-    attr_accessor :iso_path
-    attr_accessor :auto_update
-    attr_accessor :no_install
-    attr_accessor :no_remote
+    attr_accessor :iso_path, :auto_update, :installer, :no_install, :no_remote
+
+    def validate(env, errors)
+      if !installer.nil? && (!installer.is_a?(Class) || installer <= Installer::Base)
+        errors.add I18n.t("vagrant.plugins.vbguest.invalid_installer_class") 
+      end
+    end
     
     def auto_update; @auto_update.nil? ? (@auto_update = true) : @auto_update; end
     def no_remote; @no_remote.nil? ? (@no_remote = false) : @no_remote; end
@@ -15,6 +18,7 @@ module VagrantVbguest
       {
         :iso_path => iso_path,
         :auto_update => auto_update,
+        :installer => installer,
         :no_install => no_install,
         :no_remote => no_remote
       }

@@ -8,8 +8,8 @@ en:
         installing_forced: "Forcing installation of Virtualbox Guest Additions %{host} - guest's version is %{guest}"
         start_copy_iso: "Copy iso file %{from} into the box %{to}"
         start_copy_script: "Copy installer file %{from} into the box %{to}"
-        no_install_script_for_platform: "Sorry, don't know how to install on a %{platform} system. Stopping installation."
-        generic_install_script_for_platform: "%{platform} is currently not supported, will try generic Linux method..."
+        no_install_script_for_platform: "Sorry, don't know how to install on a this platform. Stopping installation."
+        generic_linux_installer: "The guest's platform is currently not supported, will try generic Linux method..."
 
         errors:
           autodetect_iso_path: |-
@@ -25,6 +25,11 @@ en:
             %{from}
             Please configure a local path to the iso using `config.vbguest.iso_path` 
             in your Vagrantfile or the `--iso` command line option.
+
+        config:
+          errors:
+            invalid_installer_class: |-
+              The specified installer does not inherit from `VagrantVbguest::Installer::Base`
 
         download:
           with: "Downloading VirtualBox Guest Additions ISO with %{class}..."

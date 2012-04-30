@@ -1,19 +1,24 @@
 require 'vagrant'
-require "vagrant-vbguest/errors"
+require 'vagrant-vbguest/errors'
+
+require 'vagrant-vbguest/installer'
+require 'vagrant-vbguest/installers/base'
+require 'vagrant-vbguest/installers/linux'
+require 'vagrant-vbguest/installers/debian'
+require 'vagrant-vbguest/installers/ubuntu'
+
+require 'vagrant-vbguest/action'
+require 'vagrant-vbguest/config'
+require 'vagrant-vbguest/command'
+
+require 'vagrant-vbguest/detector'
+require 'vagrant-vbguest/download'
+
 
 # Add our custom translations to the load path
 I18n.load_path << File.expand_path("../../locales/en.yml", __FILE__)
 
 module VagrantVbguest
-
-  autoload :Action, 'vagrant-vbguest/action'
-  autoload :Config, 'vagrant-vbguest/config'
-  autoload :Command, 'vagrant-vbguest/command'
-  autoload :Errors, 'vagrant-vbguest/errors'
-
-  autoload :Detector, "vagrant-vbguest/detector"
-  autoload :Download, "vagrant-vbguest/download"
-  autoload :Installer, "vagrant-vbguest/installer"
 
   class Plugin < Vagrant.plugin("1")
     name "vbguest management"

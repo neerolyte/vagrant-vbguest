@@ -14,7 +14,7 @@ module VagrantVbguest
     private
 
       def autodetect_iso
-        path = media_manager_iso || guess_iso || web_iso
+        path = media_manager_iso || guess_iso || (!@options[:no_remote] && web_iso)
         raise VagrantVbguest::Errors::IsoPathAutodetectionError if !path || path.empty?
         path
       end
@@ -35,7 +35,7 @@ module VagrantVbguest
       end
 
       def web_iso
-        "http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso" unless @options[:no_remote]
+        "http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso"
       end
 
   end

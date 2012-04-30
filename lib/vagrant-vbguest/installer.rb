@@ -4,6 +4,22 @@ module VagrantVbguest
 
   class Installer
 
+    class << self
+      def register(installer_class, prio = 5) 
+        @installers ||= {}
+        @installers[prio] ||= []
+        @installers[prio] << installer_class
+      end
+
+      def detect(vm)
+        @installers.keys.sort.reverse.each do |prio|
+          klass = @installers[prio].detect { |k| k.match?(vm) }
+          return klass.new(vm) if klass
+        end
+        return nil
+      end
+    end
+
     def initialize(vm, options = {})
       @env = {
         :ui => vm.ui,
@@ -32,26 +48,16 @@ module VagrantVbguest
         if @options[:force] || (!@options[:no_install] && needs_update?)
           @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing#{@options[:force] ? '_forced' : ''}", :host => vb_version, :guest => guest_version))
 
-          # :TODO:
-          # the whole installation process should be put into own classes
-          # like the vagrant system loading
-          if (i_script = installer_script)
+          if (installer = guest_installer)
             @options[:iso_path] ||= VagrantVbguest::Detector.new(@vm, @options).iso_path
 
-            @vm.ui.info(I18n.t("vagrant.plugins.vbguest.start_copy_iso", :from => iso_path, :to => iso_destination))
-            @vm.channel.upload(iso_path, iso_destination)
-
-            @vm.ui.info(I18n.t("vagrant.plugins.vbguest.start_copy_script", :from => File.basename(i_script), :to => installer_destination))
-            @vm.channel.upload(i_script, installer_destination)
-
-            @vm.channel.sudo("sh #{installer_destination}") do |type, data|
+            installer.install(iso_path) do |type, data|
               @vm.ui.info(data, :prefix => false, :new_line => false)
             end
-
-            @vm.channel.execute("rm #{installer_destination} #{iso_destination}") do |type, data|
-              @vm.ui.error(data.chomp, :prefix => false)
-            end
+          else
+            @vm.ui.error(I18n.t("vagrant.plugins.vbguest.no_install_script_for_platform"))
           end
+          
         end
       end
     ensure
@@ -71,26 +77,12 @@ module VagrantVbguest
       @vm.driver.version
     end
 
-    def installer_script
-      platform = @vm.guest.distro_dispatch
-      case platform
-      when :debian, :ubuntu
-        File.expand_path("../../../files/setup_debian.sh", __FILE__)
-      when :gentoo, :redhat, :suse, :arch, :linux
-        @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.generic_install_script_for_platform", :platform => platform.to_s))
-        File.expand_path("../../../files/setup_linux.sh", __FILE__)
+    def guest_installer
+      if @options[:installer]
+        @options[:installer].new(@vm)
       else
-        @vm.ui.error(I18n.t("vagrant.plugins.vbguest.no_install_script_for_platform", :platform => platform.to_s))
-        nil
+        Installer.detect(@vm)
       end
-    end
-
-    def installer_destination
-      '/tmp/install_vbguest.sh'
-    end
-
-    def iso_destination
-      '/tmp/VBoxGuestAdditions.iso'
     end
 
     def iso_path
@@ -119,3 +111,4 @@ module VagrantVbguest
 
   end
 end
+
