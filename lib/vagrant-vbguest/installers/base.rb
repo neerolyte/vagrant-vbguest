@@ -7,7 +7,7 @@ module VagrantVbguest
     class Base
 
       def self.match?(vm)
-        nil
+        false
       end
       
       attr_reader :vm
