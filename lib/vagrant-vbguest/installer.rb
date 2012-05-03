@@ -66,11 +66,19 @@ module VagrantVbguest
         @vm.ui.success(I18n.t("vagrant.plugins.vbguest.guest_ok", :version => guest_version)) unless needs_update?
         @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.check_failed", :host => vb_version, :guest => guest_version)) if @options[:no_install]
 
-        if @options[:force] || (!@options[:no_install] && needs_update?)
+        if !needs_update? && !KernelModuleDetector.new(@vm).loaded?
+          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.kernel_module_not_loaded"))
+          
+          if (r_script = rebuilder_script)
+            @vm.channel.sudo(r_script) do |type, data|
+              @vm.ui.info(data, :prefix => false, :new_line => false)
+            end
+          end
+        elsif @options[:force] || (!@options[:no_install] && needs_update?)
           @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing#{@options[:force] ? '_forced' : ''}", :host => vb_version, :guest => guest_version))
 
           if (installer = guest_installer)
-            @options[:iso_path] ||= VagrantVbguest::Detector.new(@vm, @options).iso_path
+            @options[:iso_path] ||= VagrantVbguest::IsoDetector.new(@vm, @options).iso_path
 
             installer.install(iso_path) do |type, data|
               @vm.ui.info(data, :prefix => false, :new_line => false)
@@ -130,6 +138,16 @@ module VagrantVbguest
           @download.download
           @download.temp_path
         end
+      end
+    end
+
+    def rebuilder_script
+      platform = @vm.guest.distro_dispatch
+      case platform
+      when :debian, :ubuntu, :gentoo, :redhat, :suse, :arch, :linux
+        '/etc/init.d/vboxadd setup'
+      else
+        nil
       end
     end
 

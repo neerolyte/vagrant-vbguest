@@ -4,6 +4,8 @@ en:
       vbguest:
         guest_ok: "Detected Virtualbox Guest Additions %{version} --- OK."
         check_failed: "Virtualbox Guest Additions on host: %{host} - guest's version is %{guest}"
+        kernel_module_not_loaded: |-
+          The Virtualbox Guest Additions kernel module is not loaded. Will try to rebuild...
         installing: "Installing Virtualbox Guest Additions %{host} - guest's version is %{guest}"
         installing_forced: "Forcing installation of Virtualbox Guest Additions %{host} - guest's version is %{guest}"
         start_copy_iso: "Copy iso file %{from} into the box %{to}"

@@ -1,6 +1,6 @@
 module VagrantVbguest
 
-  class Detector
+  class IsoDetector
 
     def initialize(vm, options)
       @vm = vm
@@ -38,5 +38,37 @@ module VagrantVbguest
         "http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso"
       end
 
+  end
+
+  class KernelModuleDetector
+
+    def initialize(vm, options = nil)
+      @vm = vm
+      @options ||= options
+    end
+
+    def loaded?
+      @vm.channel.test(kernel_module_loaded_command, :sudo => true)
+    end
+
+    private
+
+      def kernel_module_loaded_command
+        platform = @vm.guest.distro_dispatch
+        case platform
+        when :debian, :ubuntu, :gentoo, :redhat, :suse, :arch, :linux
+          'lsmod | grep vboxsf'
+        # :TODO: 
+        #   we do not yet know how to rebuild on freebsd and solaris
+        #   so it does not make a lot sense to detect them
+        # when :freebsd
+        #   'kldstat | grep vboxguest'
+        # when :solaris
+        #   '/usr/sbin/modinfo | grep "vboxguest "'
+        else
+          @vm.ui.error(I18n.t("vagrant.plugins.vbguest.no_kernel_module_checkup_for_platform", :platform => platform.to_s))
+          nil
+        end
+      end
   end
 end
