@@ -37,13 +37,26 @@ module VagrantVbguest
         '/mnt'
       end
 
+      # a generic way of installing GuestAdditions assuming all 
+      # dependencies on the guest are installed
       def install(iso_file, opts=nil, &block)
-        vm.ui.warn I18n.t("vagrant.plugins.vbguest.generic_linux_installer")
+        vm.ui.warn I18n.t("vagrant.plugins.vbguest.installer.generic_linux_installer")
         upload(iso_file)
         vm.channel.sudo("mount #{tmp_path} -o loop #{mount_point}", opts, &block)
         vm.channel.sudo("#{mount_point}/VBoxLinuxAdditions.run --nox11", opts, &block)
         vm.channel.sudo("umount #{mount_point}", opts, &block)
         cleanup  
+      end
+
+      def installed?(opts=nil, &block)
+        opts = {
+          :sudo => true
+        }.merge(opts || {})
+        vm.channel.test('lsmod | grep vboxsf', opts, &block)
+      end
+
+      def rebuild(opts=nil, &block)
+        vm.channel.sudo('/etc/init.d/vboxadd setup', opts, &block)
       end
 
     end

@@ -59,6 +59,36 @@ module VagrantVbguest
       def install(iso_file, opts=nil, &block)
       end
 
+      # Handels the rebuild of allready installed GuestAdditions
+      # It may happen, that the guest has the correct GuestAdditions
+      # version installed, but not the kernel module is not loaded.
+      # This method should perform a rebuild or try to reload the 
+      # kernel module _without_ the GuestAdditions iso file.
+      # If there is no way of rebuidling or reloading the
+      # GuestAdditions on a specific system, this method should left
+      # empty.
+      # Subclasses should override this method.
+      # 
+      # @param [Hash] opts Optional options Hash wich meight get passed to {Vagrant::Communication::SSH#execute} and firends
+      # @yield [type, data] Takes a Block like {Vagrant::Communication::Base#execute} for realtime output of the command being executed
+      # @yieldparam [String] type Type of the output, `:stdout`, `:stderr`, etc.
+      # @yieldparam [String] data Data for the given output.
+      def rebuild(opts=nil, &block)
+      end
+
+      # Determinates if the GuestAdditions kernel module is loaded.
+      # This method tests if there is a working GuestAdditions 
+      # kernel module. If there is none, {#rebuild} is beeing called.
+      # If there is no way of telling if there is a working 
+      # GuestAddition for a specific system, this method should
+      # return `true`.
+      # Subclasses should override this method.
+      # 
+      # @return [Boolean] `true` if the kernel module is loaded (and thus seems to work), `false` otherwise.
+      def installed?(opts=nil, &block)
+        true
+      end
+
       # A helper method to handle the GuestAdditions iso file upload
       def upload(file)
         vm.ui.info(I18n.t("vagrant.plugins.vbguest.start_copy_iso", :from => file, :to => tmp_path))

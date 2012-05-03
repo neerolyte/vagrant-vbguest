@@ -3,15 +3,12 @@ en:
     plugins:
       vbguest:
         guest_ok: "Detected Virtualbox Guest Additions %{version} --- OK."
-        check_failed: "Virtualbox Guest Additions on host: %{host} - guest's version is %{guest}"
-        kernel_module_not_loaded: |-
-          The Virtualbox Guest Additions kernel module is not loaded. Will try to rebuild...
+        guest_needs_update: "Virtualbox Guest Additions on host: %{host} - guest's version is %{guest}"
         installing: "Installing Virtualbox Guest Additions %{host} - guest's version is %{guest}"
         installing_forced: "Forcing installation of Virtualbox Guest Additions %{host} - guest's version is %{guest}"
+        rebuilding: "The Virtualbox Guest Additions kernel module is not loaded. Will try to rebuild..."
         start_copy_iso: "Copy iso file %{from} into the box %{to}"
         start_copy_script: "Copy installer file %{from} into the box %{to}"
-        no_install_script_for_platform: "Sorry, don't know how to install on a this platform. Stopping installation."
-        generic_linux_installer: "The guest's platform is currently not supported, will try generic Linux method..."
 
         errors:
           autodetect_iso_path: |-
@@ -29,6 +26,8 @@ en:
             in your Vagrantfile or the `--iso` command line option.
 
           installer:
+            no_installer_for_platform: "Sorry, don't know how to %{method} Virtualbox Guest Additions on this platform. Stopping installation."
+            generic_linux_installer: "The guest's platform is currently not supported, will try generic Linux method..."
             do_not_inherit_match_method: |-
               Installer classes must proviode their own `match?` method.
 

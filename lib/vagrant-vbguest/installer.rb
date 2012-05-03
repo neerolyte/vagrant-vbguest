@@ -7,6 +7,11 @@ module VagrantVbguest
   # {VagrantVbguest::Installers::Base})
   class Installer
 
+    class NoInstallerFoundError < Vagrant::Errors::VagrantError
+      error_namespace "vagrant.plugins.vbguest.errors.installer"
+      error_key "no_install_script_for_platform"
+    end
+
     class << self
       
       # Register an Installer implementation.
@@ -61,47 +66,70 @@ module VagrantVbguest
       raise Vagrant::Errors::VMInaccessible if !@vm.state == :inaccessible
       raise Vagrant::Errors::VMNotRunningError if @vm.state != :running
 
-      if @options[:auto_update]
+      return nil unless @options[:auto_update]
 
-        @vm.ui.success(I18n.t("vagrant.plugins.vbguest.guest_ok", :version => guest_version)) unless needs_update?
-        @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.check_failed", :host => vb_version, :guest => guest_version)) if @options[:no_install]
-
-        if !needs_update? && !KernelModuleDetector.new(@vm).loaded?
-          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.kernel_module_not_loaded"))
-          
-          if (r_script = rebuilder_script)
-            @vm.channel.sudo(r_script) do |type, data|
-              @vm.ui.info(data, :prefix => false, :new_line => false)
-            end
-          end
-        elsif @options[:force] || (!@options[:no_install] && needs_update?)
-          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing#{@options[:force] ? '_forced' : ''}", :host => vb_version, :guest => guest_version))
-
-          if (installer = guest_installer)
-            @options[:iso_path] ||= VagrantVbguest::IsoDetector.new(@vm, @options).iso_path
-
-            installer.install(iso_path) do |type, data|
-              @vm.ui.info(data, :prefix => false, :new_line => false)
-            end
-          else
-            @vm.ui.error(I18n.t("vagrant.plugins.vbguest.no_install_script_for_platform"))
-          end
-          
+      if @options[:force] 
+        @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing_forced", :host => vb_version, :guest => guest_version))  
+        install
+      elsif needs_update?
+        if @options[:no_install]
+          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.guest_needs_update", :host => vb_version, :guest => guest_version))  
+        else
+          @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.installing", :host => vb_version, :guest => guest_version))
+          install
         end
+      elsif needs_rebuild?
+        @vm.ui.warn(I18n.t("vagrant.plugins.vbguest.rebuilding"))
+        rebuild
+      else
+        @vm.ui.success(I18n.t("vagrant.plugins.vbguest.guest_ok", :version => guest_version))
       end
     ensure
       cleanup
+    end
+
+    def install
+      if (installer = guest_installer)
+        @options[:iso_path] ||= VagrantVbguest::Detector.new(@vm, @options).iso_path
+
+        installer.install(iso_path) do |type, data|
+          @vm.ui.info(data, :prefix => false, :new_line => false)
+        end
+      else
+        raise NoInstallerFoundError, :method => 'install'
+      end
+    end
+
+    def rebuild
+      if (installer = guest_installer)
+        installer.rebuild do |type, data|
+          @vm.ui.info(data, :prefix => false, :new_line => false)
+        end
+      else
+        raise NoInstallerFoundError, :method => 'rebuild'
+      end
     end
 
     def needs_update?
       !(guest_version && vb_version == guest_version)
     end
 
+    def needs_rebuild?
+      if (installer = guest_installer)
+        return !installer.installed?
+      else
+        raise NoInstallerFoundError, :method => 'check installation of'
+      end
+    end
+
+    # Returns the version code of the VirtualBox Guest Additions 
+    # available on the guest, or `nil` if none installed. 
     def guest_version
       guest_version = @vm.driver.read_guest_additions_version
       !guest_version ? nil : guest_version.gsub(/[-_]ose/i, '')
     end
 
+    # Returns the version code of the Virtual Box *host*
     def vb_version
       @vm.driver.version
     end
@@ -138,16 +166,6 @@ module VagrantVbguest
           @download.download
           @download.temp_path
         end
-      end
-    end
-
-    def rebuilder_script
-      platform = @vm.guest.distro_dispatch
-      case platform
-      when :debian, :ubuntu, :gentoo, :redhat, :suse, :arch, :linux
-        '/etc/init.d/vboxadd setup'
-      else
-        nil
       end
     end
 
