@@ -6,7 +6,7 @@ en:
         guest_needs_update: "Virtualbox Guest Additions on host: %{host} - guest's version is %{guest}"
         installing: "Installing Virtualbox Guest Additions %{host} - guest's version is %{guest}"
         installing_forced: "Forcing installation of Virtualbox Guest Additions %{host} - guest's version is %{guest}"
-        rebuilding: "The Virtualbox Guest Additions kernel module is not loaded. Will try to rebuild..."
+        rebuilding: "The Virtualbox Guest Additions kernel module is not loaded. Rebuilding..."
         start_copy_iso: "Copy iso file %{from} into the box %{to}"
         start_copy_script: "Copy installer file %{from} into the box %{to}"
 
