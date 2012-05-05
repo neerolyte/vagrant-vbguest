@@ -14,7 +14,6 @@ module VagrantVbguest
     def call(env)
       options = @vm.config.vbguest.to_hash
       options[:auto_update] = true if options[:auto_update].nil?
-      @vm.ui.info "auto_update is #{options[:auto_update] ? 'on' : 'off'}"
       VagrantVbguest::Installer.new(@vm, options).run
       @app.call(env)
     end
