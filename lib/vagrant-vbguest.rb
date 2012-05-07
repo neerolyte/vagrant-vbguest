@@ -29,10 +29,14 @@ module VagrantVbguest
 
     config('vbguest') { Config }
     command('vbguest') { Command }
-    Vagrant.actions[:start].use VagrantVbguest::Action
-    # I would really like to do this:
-    # action(:start) {
-    #   use VagrantVbguest::Action
-    # }
+    
+    # hook after anything that boots: 
+    # that's all middlewares which will run the buildin "VM::Boot" action
+    action_hook(Vagrant::Plugin::V1::ALL_ACTIONS) do |seq|
+      if (idx = seq.index(Vagrant::Action::VM::Boot))
+        seq.insert_after(idx, Action)
+      end
+    end
+    
   end
 end
