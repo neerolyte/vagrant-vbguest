@@ -23,20 +23,20 @@ module VagrantVbguest
   class Plugin < Vagrant.plugin("1")
     name "vbguest management"
     description <<-DESC
-    Provides automatic and/or manual management of the 
+    Provides automatic and/or manual management of the
     VirtualBox Guest Additions inside the Vagrant environment.
     DESC
 
     config('vbguest') { Config }
     command('vbguest') { Command }
-    
-    # hook after anything that boots: 
+
+    # hook after anything that boots:
     # that's all middlewares which will run the buildin "VM::Boot" action
     action_hook(Vagrant::Plugin::V1::ALL_ACTIONS) do |seq|
       if (idx = seq.index(Vagrant::Action::VM::Boot))
         seq.insert_after(idx, Action)
       end
     end
-    
+
   end
 end
