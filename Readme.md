@@ -155,23 +155,23 @@ Those places will be checked in order:
 vagrant-vbguest provides installers for generic linux and debian/ubuntu.  
 Installers take care of the whole installation process, that includes where to save the iso file inside the guest and where to mount it.
 
-    
-    class MyInstaller < VagrantVbguest::Installers::Linux
-      # use /temp instead of /tmp
-      def tmp_path
-        '/temp/VBoxGuestAdditions.iso'
-      end
+```ruby
+class MyInstaller < VagrantVbguest::Installers::Linux
+  # use /temp instead of /tmp
+  def tmp_path
+    '/temp/VBoxGuestAdditions.iso'
+  end
 
-      # use /media instead of /mnt
-      def mount_point
-        '/media'
-      end
-    end
-    
-    Vagrant::Config.run do |config|
-      config.vbguest.installer = MyInstaller
-    end
+  # use /media instead of /mnt
+  def mount_point
+    '/media'
+  end
+end
 
+Vagrant::Config.run do |config|
+  config.vbguest.installer = MyInstaller
+end
+```
 
 ## Knows Issues
 
