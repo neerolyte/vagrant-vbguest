@@ -5,7 +5,7 @@
 ## Installation
 
 Requires vagrant 0.9.4 or later (including 1.0)    
-Since vagrant v1.0.0 the preferred installation method for vagrant is using the provided packages or installers. 
+Since vagrant v1.0.0 the preferred installation method for vagrant is using the provided packages or installers.
 If you installed vagrant that way, you need to use vagrant's gem wrapper:
 
 ```bash
@@ -22,7 +22,7 @@ Compatibly for vagrant 0.8 is provided by version 0.0.3 (which lacks a bunch of 
 
 ## Configuration / Usage
 
-If you're lucky, *vagrant-vbguest* does not require any configurations. 
+If you're lucky, *vagrant-vbguest* does not require any configurations.
 However, here is an example for your `Vagrantfile`:
 
 ```ruby
@@ -56,7 +56,7 @@ vbguest will try to autodetect the best option for your system. WTF? see below.
 
 ### Running as a middleware
 
-Running as a middleware will is the default way using *vagrant-vbguest*. 
+Running as a middleware will is the default way using *vagrant-vbguest*.
 It will run automatically right after the box started. This is each time the box boots, i.e. `vagrant up` or `vagrant reload`. 
 It won't run on `vagrant resume` (or `vagrant up` a suspended box) to save you some time resuming a box.
 
@@ -97,8 +97,8 @@ When *vagrant-vbguest* is running it will provide you some logs:
 
 The plugin's part starts at `[default] Installing Virtualbox Guest Additions 4.1.14 - guest's version is 4.1.1`, telling you that:
 
-* the guest addition of the box *default* are outdated (or mismatch) 
-* which guest additions iso file will be used 
+* the guest addition of the box *default* are outdated (or mismatch)
+* which guest additions iso file will be used
 * which installer script will be used
 * all the VirtualBox Guest Additions installer output.
 
@@ -134,7 +134,7 @@ Telling you either about a version mismatch:
 
     [default] Virtualbox Guest Additions on host: 4.1.14 - guest's version is 4.1.0
 
-or a match: 
+or a match:
 
     [default] Detected Virtualbox Guest Additions 4.1.14 --- OK
 
