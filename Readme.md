@@ -48,7 +48,7 @@ end
 The `iso_path` may contain the optional placeholder `$VBOX_VERSION` for the detected version (e.g. `4.1.8`).
 The URI for the actual iso download reads: `http://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso`<br/>
 vbguest will try to autodetect the best option for your system. WTF? see below.
-* `installer` : A reference to a (custom) installer class
+* `installer` (`VagrantVbguest::Installers::Base`, optional) : Reference to an (custom) installer class
 * `auto_update` (Boolean, default: `true`) : Whether to check the correct additions version on each start (where start is _not_ resuming a box).
 * `no_install` (Boolean, default: `false`) : Whether to check the correct additions version only. This will warn you about version mis-matches, but will not try to install anything.
 * `no_remote` (Boolean, default: `false`) : Whether to _not_ download the iso file from a remote location. This includes any `http` location!
