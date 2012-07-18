@@ -2,7 +2,7 @@ require 'optparse'
 
 module VagrantVbguest
 
-  class Command < Vagrant::Command::Base
+  class Command < Vagrant::plugin("1", :command)
 
     # Runs the vbguest installer on the VMs that are represented
     # by this environment.

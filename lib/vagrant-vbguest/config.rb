@@ -1,6 +1,6 @@
 module VagrantVbguest
 
-  class Config < Vagrant::Config::Base
+  class Config < Vagrant::plugin("1", :config)
     attr_accessor :iso_path, :auto_update, :installer, :no_install, :no_remote
 
     def validate(env, errors)

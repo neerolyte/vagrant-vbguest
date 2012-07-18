@@ -32,7 +32,7 @@ module VagrantVbguest
 
     # hook after anything that boots:
     # that's all middlewares which will run the buildin "VM::Boot" action
-    action_hook(Vagrant::Plugin::V1::ALL_ACTIONS) do |seq|
+    action_hook(self::ALL_ACTIONS) do |seq|
       if (idx = seq.index(Vagrant::Action::VM::Boot))
         seq.insert_after(idx, Action)
       end
